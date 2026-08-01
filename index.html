@@ -380,7 +380,7 @@
         <div class="brand-icon">AI</div>
         <div>
           <h1>My Chatbot</h1>
-          <p>Frontend demo</p>
+          <p>Live Backend Connected</p>
         </div>
       </div>
 
@@ -393,7 +393,7 @@
       <div class="topbar">
         <div>
           <h2>Chat Assistant</h2>
-          <small>Frontend only for now</small>
+          <small>Powered by Render & OpenAI</small>
         </div>
         <button class="toggle" id="themeToggle">Toggle Theme</button>
       </div>
@@ -402,8 +402,8 @@
         <div class="empty" id="emptyState">
           <h3>Welcome 👋</h3>
           <p>
-            This is your chatbot frontend.<br />
-            Type a message below and it will reply with a mock AI response for now.
+            Your chatbot is connected to Render!<br />
+            Type a message below to test your live API.
           </p>
         </div>
       </div>
@@ -421,7 +421,8 @@
       </div>
     </main>
   </div>
-<script>
+
+  <script>
     const messagesEl = document.getElementById("messages");
     const inputEl = document.getElementById("userInput");
     const sendBtn = document.getElementById("sendBtn");
@@ -430,7 +431,7 @@
     const themeToggle = document.getElementById("themeToggle");
     const emptyState = document.getElementById("emptyState");
 
-    // Replace '/api/chat' if your backend endpoint path is different (e.g., '/chat' or '/message')
+    // Live Render URL Endpoint
     const BACKEND_URL = "https://somthing-again-back.onrender.com/api/chat";
 
     let chats = JSON.parse(localStorage.getItem("my_chatbot_chats")) || [
@@ -555,7 +556,6 @@
       if (typingRow) typingRow.remove();
     }
 
-    // Connects to Render Backend
     async function sendMessage() {
       const text = inputEl.value.trim();
       if (!text) return;
@@ -576,17 +576,28 @@
           body: JSON.stringify({ message: text })
         });
 
-        const data = await response.json();
         removeTypingIndicator();
 
-        // Check response data key (adjust data.reply/data.message depending on your server response format)
-        const botReply = data.reply || data.message || data.response || "No response text received.";
+        // If backend returns an HTTP error code (404, 500, etc.)
+        if (!response.ok) {
+          if (response.status === 404) {
+            addMessage("bot", "⚠️ Error 404: Endpoint path not found. Ensure backend server.js defines app.post('/api/chat', ...)");
+          } else if (response.status === 500) {
+            addMessage("bot", "⚠️ Error 500: Server crashed processing request. Check Render dashboard logs for API key or model errors.");
+          } else {
+            addMessage("bot", `⚠️ Server returned error status: ${response.status} ${response.statusText}`);
+          }
+          return;
+        }
+
+        const data = await response.json();
+        const botReply = data.reply || data.message || data.response || (typeof data === "string" ? data : "Received empty reply from server.");
         addMessage("bot", botReply);
 
       } catch (error) {
         console.error("Fetch Error:", error);
         removeTypingIndicator();
-        addMessage("bot", "⚠️ Could not connect to backend server. (Note: Render free tier takes ~50 seconds to start up on first request).");
+        addMessage("bot", `⚠️ Network/CORS Error: Could not connect to Render backend. Check if CORS is installed on backend or if Render free tier is warming up (~50s delay).`);
       } finally {
         sendBtn.disabled = false;
       }
@@ -625,7 +636,6 @@
     renderChatList();
     renderMessages();
     autoResize();
-</script>
-  
+  </script>
 </body>
 </html>
