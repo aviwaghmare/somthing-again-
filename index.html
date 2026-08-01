@@ -431,8 +431,8 @@
     const themeToggle = document.getElementById("themeToggle");
     const emptyState = document.getElementById("emptyState");
 
-    // Live Render URL Endpoint
-    const BACKEND_URL = "https://somthing-again-back.onrender.com/api/chat";
+    // Live Render URL Endpoint (Updated Route)
+    const BACKEND_URL = "https://somthing-again-back.onrender.com/chat";
 
     let chats = JSON.parse(localStorage.getItem("my_chatbot_chats")) || [
       {
@@ -578,12 +578,11 @@
 
         removeTypingIndicator();
 
-        // If backend returns an HTTP error code (404, 500, etc.)
         if (!response.ok) {
           if (response.status === 404) {
-            addMessage("bot", "⚠️ Error 404: Endpoint path not found. Ensure backend server.js defines app.post('/api/chat', ...)");
+            addMessage("bot", "⚠️ Error 404: Route still not found. Check server.js for app.post route definition.");
           } else if (response.status === 500) {
-            addMessage("bot", "⚠️ Error 500: Server crashed processing request. Check Render dashboard logs for API key or model errors.");
+            addMessage("bot", "⚠️ Error 500: Server crashed. Check Render dashboard logs.");
           } else {
             addMessage("bot", `⚠️ Server returned error status: ${response.status} ${response.statusText}`);
           }
@@ -597,7 +596,7 @@
       } catch (error) {
         console.error("Fetch Error:", error);
         removeTypingIndicator();
-        addMessage("bot", `⚠️ Network/CORS Error: Could not connect to Render backend. Check if CORS is installed on backend or if Render free tier is warming up (~50s delay).`);
+        addMessage("bot", `⚠️ Network/CORS Error: Could not connect to Render backend.`);
       } finally {
         sendBtn.disabled = false;
       }
