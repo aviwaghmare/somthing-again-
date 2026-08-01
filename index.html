@@ -421,8 +421,7 @@
       </div>
     </main>
   </div>
-
-  <script>
+<script>
     const messagesEl = document.getElementById("messages");
     const inputEl = document.getElementById("userInput");
     const sendBtn = document.getElementById("sendBtn");
@@ -430,6 +429,9 @@
     const chatListEl = document.getElementById("chatList");
     const themeToggle = document.getElementById("themeToggle");
     const emptyState = document.getElementById("emptyState");
+
+    // Replace '/api/chat' if your backend endpoint path is different (e.g., '/chat' or '/message')
+    const BACKEND_URL = "https://somthing-again-back.onrender.com/api/chat";
 
     let chats = JSON.parse(localStorage.getItem("my_chatbot_chats")) || [
       {
@@ -553,26 +555,8 @@
       if (typingRow) typingRow.remove();
     }
 
-    function mockBotReply(userText) {
-      const lower = userText.toLowerCase();
-
-      if (lower.includes("hello") || lower.includes("hi")) {
-        return "Hello! Nice to meet you. Tell me what you want to build.";
-      }
-      if (lower.includes("api")) {
-        return "Great idea. Later, we can connect this frontend to your backend API securely.";
-      }
-      if (lower.includes("code")) {
-        return "Sure. I can help you write HTML, CSS, JavaScript, and backend code step by step.";
-      }
-      if (lower.includes("price") || lower.includes("free")) {
-        return "For the frontend, hosting can be free. The API usage may depend on your backend provider and model.";
-      }
-
-      return "I understand. This is a mock reply for now. Later we will replace it with a real AI response.";
-    }
-
-    function sendMessage() {
+    // Connects to Render Backend
+    async function sendMessage() {
       const text = inputEl.value.trim();
       if (!text) return;
 
@@ -583,12 +567,29 @@
 
       showTypingIndicator();
 
-      setTimeout(() => {
+      try {
+        const response = await fetch(BACKEND_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: text })
+        });
+
+        const data = await response.json();
         removeTypingIndicator();
-        const reply = mockBotReply(text);
-        addMessage("bot", reply);
+
+        // Check response data key (adjust data.reply/data.message depending on your server response format)
+        const botReply = data.reply || data.message || data.response || "No response text received.";
+        addMessage("bot", botReply);
+
+      } catch (error) {
+        console.error("Fetch Error:", error);
+        removeTypingIndicator();
+        addMessage("bot", "⚠️ Could not connect to backend server. (Note: Render free tier takes ~50 seconds to start up on first request).");
+      } finally {
         sendBtn.disabled = false;
-      }, 900);
+      }
     }
 
     inputEl.addEventListener("input", autoResize);
@@ -624,6 +625,7 @@
     renderChatList();
     renderMessages();
     autoResize();
-  </script>
+</script>
+  
 </body>
 </html>
