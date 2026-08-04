@@ -431,8 +431,51 @@
     const themeToggle = document.getElementById("themeToggle");
     const emptyState = document.getElementById("emptyState");
 
-    // Live Render URL Endpoint (Updated Route)
-    const BACKEND_URL = "https://somthing-again-back.onrender.com/chat";
+    // ======================================================================
+    // 🔧 HOW TO CONNECT YOUR NEW RENDER BACKEND URL — READ THIS FIRST 🔧
+    // ======================================================================
+    // Below, BACKEND_URL is currently set to a PLACEHOLDER value:
+    //
+    //     "https://PASTE-YOUR-NEW-RENDER-URL-HERE.onrender.com/chat"
+    //
+    // You must replace this with the REAL URL of your redeployed backend
+    // service before the chatbot will work. Follow these steps exactly:
+    //
+    // STEP 1 — Redeploy / create your backend service on Render
+    //   Push the updated "server.js", "routes/chat.js", and "package.json"
+    //   (the fixed versions with a valid OpenAI model) to your GitHub repo,
+    //   then create (or update) a Web Service on Render pointing at that repo.
+    //
+    // STEP 2 — Set the environment variable on Render
+    //   In Render dashboard → your service → "Environment" tab, add:
+    //     OPENAI_API_KEY = sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxx   (your real key)
+    //   Optionally also add:
+    //     OPENAI_MODEL = gpt-4o-mini
+    //
+    // STEP 3 — Wait for the deploy to finish (status turns "Live" in green)
+    //   Render will show you the live URL at the top of the service page,
+    //   it looks like this:
+    //     https://your-service-name-xxxx.onrender.com
+    //
+    // STEP 4 — Copy that URL and paste it below, EXACTLY, replacing the
+    //   placeholder text between the quotes. Make sure you:
+    //     ✅ Keep the "https://" at the start
+    //     ✅ Do NOT add a trailing slash before "/chat"
+    //     ✅ Add "/chat" at the end, because that is the route defined
+    //        in routes/chat.js (app.use("/chat", chatRouter))
+    //
+    //   Example of a correctly filled-in line:
+    //     const BACKEND_URL = "https://my-ai-chatbot-9k2j.onrender.com/chat";
+    //
+    // STEP 5 — Save this file and re-open / redeploy your frontend
+    //   (e.g. push to GitHub Pages, or refresh if running locally).
+    //
+    // STEP 6 — Test it
+    //   Type a message in the chat box. If it still fails, open this page's
+    //   browser console (F12 → Console tab) and check the exact error, and
+    //   also check your Render backend's "Logs" tab for matching errors.
+    // ======================================================================
+    const BACKEND_URL = "https://PASTE-YOUR-NEW-RENDER-URL-HERE.onrender.com/chat";
 
     let chats = JSON.parse(localStorage.getItem("my_chatbot_chats")) || [
       {
@@ -638,4 +681,3 @@
   </script>
 </body>
 </html>
-
